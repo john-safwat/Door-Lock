@@ -2,9 +2,18 @@ import 'package:doorlock/Theme/Theme.dart';
 import 'package:doorlock/UI/Login/LoginView.dart';
 import 'package:doorlock/UI/Splash/SplashView.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async{
 
+  // block the code building for the loading of data
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 
 }

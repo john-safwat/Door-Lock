@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1015175199599",
+    "project_id": "mohra-door-lock",
+    "storage_bucket": "mohra-door-lock.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1015175199599:android:c69f2dae48500cfd8b069a",
+        "android_client_info": {
+          "package_name": "com.example.doorlock"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVXoKYYkl8sh3-4NeFo7jxtkb4t8YQFQY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
