@@ -23,7 +23,7 @@ class FirebaseAuthUserDatabase {
   final _firebase = FirebaseAuth.instance;
 
   // function to create user in firebase auth
-  Future<User> createUser({required UserDTO user}) async {
+  Future<User> createUser({required MyUser user}) async {
     await _firebase.createUserWithEmailAndPassword(
         email: user.email,
         password: user.password).then((value) => value.user!.updateDisplayName(user.name));

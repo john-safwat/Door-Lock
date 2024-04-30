@@ -1,5 +1,8 @@
 import 'package:doorlock/Theme/Theme.dart';
+import 'package:doorlock/UI/ForgetPassword/ForgetPasswordView.dart';
+import 'package:doorlock/UI/Home/HomeView.dart';
 import 'package:doorlock/UI/Login/LoginView.dart';
+import 'package:doorlock/UI/Registration/RegistrationView.dart';
 import 'package:doorlock/UI/Splash/SplashView.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -27,8 +30,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: MyTheme.theme,
       routes: {
-        SplashView.routeName :  (context) => SplashView(),
-        LoginView.routeName : (context) => LoginView()
+        SplashView.routeName :  (context) => const SplashView(),
+        LoginView.routeName : (context) => LoginView(),
+        RegistrationView.routeName : (context) => RegistrationView(),
+        HomeView.routeName : (context) => HomeView(),
+        ForgetPasswordView.routeName : (context) => ForgetPasswordView()
       },
 
       initialRoute: SplashView.routeName ,

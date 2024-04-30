@@ -1,3 +1,10 @@
+import 'package:doorlock/Firebase/FirebaseAuthUserDatabase.dart';
+import 'package:doorlock/Firebase/FirebaseUserDatabase.dart';
+import 'package:doorlock/Models/Users/UserDTO.dart';
+import 'package:doorlock/UI/ForgetPassword/ForgetPasswordView.dart';
+import 'package:doorlock/UI/Home/HomeView.dart';
+import 'package:doorlock/UI/Registration/RegistrationView.dart';
+import 'package:doorlock/Utils/DialogUtils.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -5,6 +12,7 @@ import 'package:flutter_svg/svg.dart';
 class LoginView extends StatefulWidget {
 
   static const String routeName = "login";
+
   LoginView({super.key});
 
   @override
@@ -12,6 +20,9 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
+  FirebaseAuthUserDatabase authUserDatabase = injectFirebaseAuthUserDatabase();
+  FirebaseUserDatabase userDatabase = injectFirebaseUserDatabase();
+
   // define the from key and text field controller
   final formKey = GlobalKey<FormState>();
 
@@ -34,9 +45,9 @@ class _LoginViewState extends State<LoginView> {
           SizedBox(
               height: 150,
               child: Builder(
-                builder: (context) {
-                  return SvgPicture.asset("assets/svg/Logo.svg");
-                }
+                  builder: (context) {
+                    return SvgPicture.asset("assets/svg/Logo.svg");
+                  }
               )
           ),
           // white space between the from and image
@@ -50,14 +61,19 @@ class _LoginViewState extends State<LoginView> {
               children: [
                 // the text from field for the email
                 TextFormField(
-                  style: Theme.of(context).textTheme.bodyLarge,
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .bodyLarge,
                   controller: emailController,
                   validator: (value) {
                     return emailValidation(value ?? "");
                   },
                   autovalidateMode:
                   AutovalidateMode.onUserInteraction,
-                  cursorColor: Theme.of(context).primaryColor,
+                  cursorColor: Theme
+                      .of(context)
+                      .primaryColor,
                   keyboardType: TextInputType.emailAddress,
                   cursorHeight: 20,
                   decoration: const InputDecoration(
@@ -73,14 +89,19 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 // the text from field for the email
                 TextFormField(
-                  style: Theme.of(context).textTheme.bodyLarge,
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .bodyLarge,
                   controller: passwordController,
                   validator: (value) {
                     return passwordValidation(value ?? "");
                   },
                   autovalidateMode:
                   AutovalidateMode.onUserInteraction,
-                  cursorColor: Theme.of(context).primaryColor,
+                  cursorColor: Theme
+                      .of(context)
+                      .primaryColor,
                   keyboardType: TextInputType.visiblePassword,
                   obscureText: !visible,
                   cursorHeight: 20,
@@ -141,7 +162,10 @@ class _LoginViewState extends State<LoginView> {
             children: [
               Text(
                 "Don't Have Account? ",
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .bodyLarge,
               ),
               TextButton(
                   onPressed: goToRegisterScreen,
@@ -163,7 +187,10 @@ class _LoginViewState extends State<LoginView> {
               ),
               Text(
                 "or",
-                style: Theme.of(context).textTheme.titleMedium,
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .titleMedium,
               ),
               const SizedBox(
                 width: 10,
@@ -187,7 +214,8 @@ class _LoginViewState extends State<LoginView> {
                   children: [
                     Icon(
                       EvaIcons.google,
-                      color: Theme.of(context)
+                      color: Theme
+                          .of(context)
                           .secondaryHeaderColor,
                     ),
                     const SizedBox(
@@ -243,15 +271,62 @@ class _LoginViewState extends State<LoginView> {
   // navigation functions
   // function to go to the registration screen
   goToRegisterScreen() {
-
+    Navigator.pushNamed(context, RegistrationView.routeName);
   }
 
   // function to go to forgetPassword screen
   goToForgetPasswordScreen() {
-
+    Navigator.pushNamed(context, ForgetPasswordView.routeName);
   }
 
-  Future<void> signInWithEmailAndPassword() async {}
-  void loginWithGoogle()async{}
+  goToHomeScreen() {
+    Navigator.pushReplacementNamed(context, HomeView.routeName);
+  }
+
+  Future<void> signInWithEmailAndPassword() async {
+    if (formKey.currentState!.validate()) {
+      MyDialogUtils.showLoadingDialog(context: context, message: "Loading....");
+      try {
+        var user = await authUserDatabase.signInUserWithEmailAndPassword(
+            email: emailController.text,
+            password: passwordController.text);
+        var exist = await userDatabase.userExist(uid: user.uid);
+        if(!exist){
+          await userDatabase.createUser(user: MyUser(
+              uid: user.uid,
+              name: user.displayName??"Unknown",
+              email: user.email??"Unknown",
+              password:"Unknown",
+              image: user.photoURL??"Unknown"));
+        }
+        MyDialogUtils.hideDialog(context);
+        MyDialogUtils.showSuccessMessage(context: context, message: "Logged in Successfully" , posActionTitle: "ok" , posAction: goToHomeScreen);
+      }catch(e){
+        MyDialogUtils.hideDialog(context);
+        MyDialogUtils.showFailMessage(context: context, message: e.toString() , posActionTitle: "ok");
+      }
+    }
+  }
+
+  void loginWithGoogle() async {
+    MyDialogUtils.showLoadingDialog(context: context, message: "Loading....");
+    try {
+      var user = await authUserDatabase.signInWithGoogle();
+      var exist = await userDatabase.userExist(uid: user.uid);
+      if(!exist){
+        await userDatabase.createUser(user: MyUser(
+            uid: user.uid,
+            name: user.displayName??"Unknown",
+            email: user.email??"Unknown",
+            password:"Unknown",
+            image: user.photoURL??"Unknown"));
+      }
+      MyDialogUtils.hideDialog(context);
+      MyDialogUtils.showSuccessMessage(context: context, message: "Logged in Successfully" , posActionTitle: "ok" , posAction: goToHomeScreen);
+    }catch(e){
+      MyDialogUtils.hideDialog(context);
+      MyDialogUtils.showSuccessMessage(context: context, message: e.toString() , posActionTitle: "ok");
+    }
+  }
 
 }
